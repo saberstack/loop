@@ -64,6 +64,12 @@ Now you can stop only this loop:
 ;=> true
 ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id 42]]
 ```
+If you start a second go-loop with the same :id, the first loop will be send a stop call.
+
+A ss.loop/go-loop always exits on the very next (recur ...) call. It does not "die" automagically in the middle of execution.
+
+IMPORTANT: if the first loop is stuck waiting in its own code, say via (<! ...), there's no guarantee that it will be stopped before the second loop begins. 
+
 
 ## License
 

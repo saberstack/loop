@@ -13,8 +13,18 @@
 (defonce *id->stop-ch (atom {}))
 
 
-(defn cleanup [id]
-  (swap! *id->stop-ch dissoc id))
+(defn cleanup [id stop-ch]
+  (swap! *id->stop-ch
+    (fn [m]
+      (let [-stop-ch (get m id)]
+        ;IMPORTANT!
+        ;make sure we don't cleanup another loop's stop-ch
+        ;check if channels are the same
+        (if (= -stop-ch stop-ch)
+          ;yes, cleanup
+          (dissoc m id)
+          ;else, return as-is
+          m)))))
 
 
 (defn stop-loop [[id stop-ch]]
@@ -80,46 +90,52 @@
                            ?custom-id#
                            id#)]
            (print-info [::start [:id final-id#]])
+           ;stop loop with the same :id (if it exists)
+           (stop final-id#)
+           ;add stop-ch to atom
            (swap! *id->stop-ch (fn [m#] (assoc m# final-id# stop-ch#)))
-
+           ;start the loop
            (a/go
              (let [ret# (a/<! (a/go
+                                ;the actual loop here
                                 (loop ~bindings'#
                                   (let [stop-or-nil# (a/poll! stop-ch#)]
                                     (if (= stop-or-nil# :stop)
+                                      ;going to stop the loop
                                       (do
                                         (print-info [::stop [:id final-id#]]))
                                       ;else, continue
                                       (do
+                                        ;user code
                                         ~@body))))))]
-               (cleanup final-id#)
+               (cleanup final-id# stop-ch#)
                ret#)))))))
 
 
 
-#?(:clj
-   (defmacro thread-loop [bindings & body]
-     (let [?id-expr#  (find-expr :id bindings)
-           bindings'# (remove-ks #{:id} bindings)]
-       `(start-go
-          (fn [id# stop-ch#]
-            (let [final-id# (if-let [?custom-id# ~?id-expr#]
-                              ?custom-id#
-                              id#)]
-              (print-info [::start [:id final-id#]])
-              (swap! *id->stop-ch (fn [m#] (assoc m# final-id# stop-ch#)))
-
-              (a/thread
-                (let [ret# (a/<!! (a/thread
-                                    (loop ~bindings'#
-                                      (let [stop-or-nil# (a/poll! stop-ch#)]
-                                        (if (= stop-or-nil# :stop)
-                                          (do
-                                            (print-info [::stop [:id final-id#]]))
-                                          ;else, continue
-                                          (do
-                                            ~@body))))))]
-                  (cleanup final-id#)
-                  ret#))))))))
-
-
+;#?(:clj
+;   (defmacro thread-loop [bindings & body]
+;     (let [?id-expr#  (find-expr :id bindings)
+;           bindings'# (remove-ks #{:id} bindings)]
+;       `(start-go
+;          (fn [id# stop-ch#]
+;            (let [final-id# (if-let [?custom-id# ~?id-expr#]
+;                              ?custom-id#
+;                              id#)]
+;              (print-info [::start [:id final-id#]])
+;              (swap! *id->stop-ch (fn [m#] (assoc m# final-id# stop-ch#)))
+;
+;              (a/thread
+;                (let [ret# (a/<!! (a/thread
+;                                    (loop ~bindings'#
+;                                      (let [stop-or-nil# (a/poll! stop-ch#)]
+;                                        (if (= stop-or-nil# :stop)
+;                                          (do
+;                                            (print-info [::stop [:id final-id#]]))
+;                                          ;else, continue
+;                                          (do
+;                                            ~@body))))))]
+;                  (cleanup final-id#)
+;                  ret#))))))))
+;
+;
