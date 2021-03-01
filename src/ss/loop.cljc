@@ -42,7 +42,7 @@
 
 
 (defn- start-go
-  "start-go-fn - fn that start a go, takes new-uuid and stop-ch; needs to take care of stopping the go via alts!"
+  "start-go-fn - fn that starts a go, takes new-uuid and stop-ch; needs to take care of stopping the go via alts!"
   [start-go-fn]
   (let [stop-ch (a/promise-chan (filter (fn [x] (= x :stop))))
         id      (random-uuid)]
