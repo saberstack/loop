@@ -1,6 +1,6 @@
-(ns saberstack.loop-test
+(ns ss.loop-test
   (:require [clojure.test :refer :all]
-            [saberstack.loop :refer :all]))
+            [ss.loop :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."

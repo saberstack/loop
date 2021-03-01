@@ -2,7 +2,7 @@
   (:require [clojure.core.async :as a]
             [taoensso.timbre :as timbre])
   #?(:cljs
-     (:require-macros saberstack.loop)))
+     (:require-macros ss.loop)))
 
 
 #?(:clj
@@ -13,11 +13,11 @@
 (defonce *id->stop-ch (atom {}))
 
 
-(defn- cleanup [id]
+(defn cleanup [id]
   (swap! *id->stop-ch dissoc id))
 
 
-(defn- stop-loop [[id stop-ch]]
+(defn stop-loop [[id stop-ch]]
   (a/put! stop-ch :stop))
 
 
@@ -41,7 +41,7 @@
       nil)))
 
 
-(defn- start-go
+(defn start-go
   "start-go-fn - fn that starts a go, takes new-uuid and stop-ch; needs to take care of stopping the go via alts!"
   [start-go-fn]
   (let [stop-ch (a/promise-chan (filter (fn [x] (= x :stop))))
