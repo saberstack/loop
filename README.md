@@ -1,59 +1,69 @@
-# Loop: Take control of your core.async loops! 
+# Loop: Take control of your core.async loops!
 
-    ;deps.edn
-    saberstack/loop {:git/url "https://github.com/saberstack/loop"
-                     :sha "08b7932b95ea3fe5e0b79b071d1fde694362b94d"}
-
-
+```clojure
+;deps.edn
+saberstack/loop {:git/url "https://github.com/saberstack/loop"
+                 :sha     "08b7932b95ea3fe5e0b79b071d1fde694362b94d"}
+```
 ## Usage
 
 Add require:
 
-    (ns my-ns 
-      (:require 
-        [ss.loop :as ss|a]
-        [clojure.core.async :as a]))
+```clojure
+(ns my-ns
+  (:require
+    [ss.loop :as ss|a]
+    [clojure.core.async :as a]))
+```
 
 Start a core.async go-loop as usual, but using the ss.loop/go-loop macro:
 
-    (ss|a/go-loop [i 0]
-      (println i) 
-      (<! (timeout 500)) 
-      (recur (inc i)))
-    
-    ;starts printing
-    ;=>
-    ;0
-    ;1
-    ;2
-    ;3
-    ;...
+```clojure
+(ss|a/go-loop
+  [i 0]
+  (println i)
+  (<! (timeout 500))
+  (recur (inc i)))
+
+;starts printing
+;=>
+;0
+;1
+;2
+;3
+;...
+```
 
 Now, stop the go-loop from the REPL:
 
-    ;stops all running go-loops started via ss.loop/go-loop
-    (ss|a/stop-all)
+```clojure
+;stops all running go-loops started via ss.loop/go-loop
+(ss|a/stop-all)
 
-    => true
-    ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "8a4a2d21-1a9d-4a71-b017-b97169517db6"]]
+;=> true
+;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "8a4a2d21-1a9d-4a71-b017-b97169517db6"]]
+```
 
+ss.loop/go-loop also supports giving identifier to a loop:
 
-ss.loop/go-loop also supports giving identifier to a loop: 
-
-    (ss|a/go-loop [i 0
-                   :id 42]
-      (println i)
-      (<! (timeout 500))
-      (recur (inc i)))
+```clojure
+(ss|a/go-loop
+  [i 0
+   :id 42]
+  (println i)
+  (<! (timeout 500))
+  (recur (inc i)))
+```
 
 Now you can stop only this loop:
 
-    (ss|a/stop 42)
+```clojure
+(ss|a/stop 42)
 
-    ;returns true if the loop exists, nil otherwise
-    ;=> true
-    ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id 42]]
-
+;returns true if the loop exists, nil otherwise
+;=> true
+;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id 42]]
+```
 
 ## License
 
