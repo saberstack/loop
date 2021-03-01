@@ -41,7 +41,7 @@ Now, stop the go-loop from the REPL:
 (ss|a/stop-all)
 
 ;=> true
-;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "8a4a2d21-1a9d-4a71-b017-b97169517db6"]]
+;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "..."]]
 ```
 
 ss.loop/go-loop also supports giving identifier to a loop:
