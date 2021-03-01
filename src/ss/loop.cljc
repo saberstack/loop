@@ -21,13 +21,18 @@
   (a/put! stop-ch :stop))
 
 
-(defn stop-all []
+(defn stop-all
+  "Stops all loops. Returns true."
+  []
   (run!
     stop-loop
-    @*id->stop-ch))
+    @*id->stop-ch)
+  true)
 
 
-(defn stop [id]
+(defn stop
+  "Stop a loop by id. Returns true if the loop exists, nil otherwise"
+  [id]
   (let [[_ _ :as e] (find @*id->stop-ch id)]
     (if e
       (do

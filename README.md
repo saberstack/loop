@@ -1,35 +1,61 @@
-# loop
+# Loop: Take control of your core.async loops! 
 
-FIXME: my new library.
+    ;deps.edn
+    saberstack/loop {:git/url "https://github.com/saberstack/loop" :sha "1e8181facea003375f46af3ff68543e451319b35"}
+
 
 ## Usage
 
-FIXME: write usage documentation!
+Add require:
 
-Invoke a library API function from the command-line:
+    (ns my-ns 
+      (:require 
+        [ss.loop :as ss|a]
+        [clojure.core.async :as a]))
 
-    $ clojure -X saberstack.loop/foo :a 1 :b '"two"'
-    {:a 1, :b "two"} "Hello, World!"
+Start a core.async go-loop as usual, but using the ss.loop/go-loop macro:
 
-Run the project's tests (they'll fail until you edit them):
+    (ss|a/go-loop [i 0]
+      (println i) 
+      (<! (timeout 500)) 
+      (recur (inc i)))
+    
+    ;starts printing
+    ;=>
+    ;0
+    ;1
+    ;2
+    ;3
+    ;...
 
-    $ clojure -M:test:runner
+Now, stop the go-loop from the REPL:
 
-Build a deployable jar of this library:
+    ;stops all running go-loops started via ss.loop/go-loop
+    (ss|a/stop-all)
 
-    $ clojure -X:jar
+    => true
+    ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "8a4a2d21-1a9d-4a71-b017-b97169517db6"]]
 
-Install it locally:
 
-    $ clojure -M:install
+ss.loop/go-loop also supports giving identifier to a loop: 
 
-Deploy it to Clojars -- needs `CLOJARS_USERNAME` and `CLOJARS_PASSWORD` environment variables:
+    (ss|a/go-loop [i 0
+                   :id 42]
+      (println i)
+      (<! (timeout 500))
+      (recur (inc i)))
 
-    $ clojure -M:deploy
+Now you can stop only this loop:
+
+    (ss|a/stop 42)
+
+    ;returns true if the loop exists, nil otherwise
+    ;=> true
+    ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id 42]]
+
 
 ## License
 
-Copyright © 2021 Raspasov
+Copyright © 2021 raspasov
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the Eclipse Public License 1.0
