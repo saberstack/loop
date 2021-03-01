@@ -1,7 +1,8 @@
 # Loop: Take control of your core.async loops! 
 
     ;deps.edn
-    saberstack/loop {:git/url "https://github.com/saberstack/loop" :sha "1e8181facea003375f46af3ff68543e451319b35"}
+    saberstack/loop {:git/url "https://github.com/saberstack/loop"
+                     :sha "08b7932b95ea3fe5e0b79b071d1fde694362b94d"}
 
 
 ## Usage
