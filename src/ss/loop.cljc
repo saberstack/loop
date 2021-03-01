@@ -111,31 +111,3 @@
                (cleanup final-id# stop-ch#)
                ret#)))))))
 
-
-
-;#?(:clj
-;   (defmacro thread-loop [bindings & body]
-;     (let [?id-expr#  (find-expr :id bindings)
-;           bindings'# (remove-ks #{:id} bindings)]
-;       `(start-go
-;          (fn [id# stop-ch#]
-;            (let [final-id# (if-let [?custom-id# ~?id-expr#]
-;                              ?custom-id#
-;                              id#)]
-;              (print-info [::start [:id final-id#]])
-;              (swap! *id->stop-ch (fn [m#] (assoc m# final-id# stop-ch#)))
-;
-;              (a/thread
-;                (let [ret# (a/<!! (a/thread
-;                                    (loop ~bindings'#
-;                                      (let [stop-or-nil# (a/poll! stop-ch#)]
-;                                        (if (= stop-or-nil# :stop)
-;                                          (do
-;                                            (print-info [::stop [:id final-id#]]))
-;                                          ;else, continue
-;                                          (do
-;                                            ~@body))))))]
-;                  (cleanup final-id#)
-;                  ret#))))))))
-;
-;
