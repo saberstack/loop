@@ -3,7 +3,7 @@
 ```clojure
 ;deps.edn
 saberstack/loop {:git/url "https://github.com/saberstack/loop"
-                 :sha     "150acd7dc0d6e87a632e08336fca2bd5c89bbf33"}
+                 :sha     "8cdc216cba29dd283e96d58ef03f2e74094f32e8"}
 ```
 ## Usage
 
