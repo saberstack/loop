@@ -1,10 +1,17 @@
 # Loop: Take control of your core.async loops!
+[![Clojars Project](https://img.shields.io/clojars/v/saberstack/loop.svg)](https://clojars.org/saberstack/loop)
+
+## Install
 
 ```clojure
 ;deps.edn
-saberstack/loop {:git/url "https://github.com/saberstack/loop"
-                 :sha     "456f1e20f626d9c982c9a7f22eb8853c167c1ef8"}
+saberstack/loop {:mvn/version "0.1.2"}
+
+;Leiningen/Boot
+[saberstack/loop "0.1.2"]
 ```
+
+
 ## Usage
 
 Add require:
@@ -22,7 +29,7 @@ Start a core.async go-loop as usual, but using the ss.loop/go-loop macro:
 (ss|a/go-loop
   [i 0]
   (println i)
-  (<! (timeout 500))
+  (a/<! (a/timeout 500))
   (recur (inc i)))
 
 ;starts printing
@@ -51,7 +58,7 @@ ss.loop/go-loop also supports giving identifier to a loop:
   [i 0
    :id 42]
   (println i)
-  (<! (timeout 500))
+  (a/<! (a/timeout 500))
   (recur (inc i)))
 ```
 

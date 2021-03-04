@@ -17,5 +17,8 @@
                    :exec-args  {:jar "loop.jar"}}
          :install {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.1"}}
                    :main-opts  ["-m" "deps-deploy.deps-deploy" "install" "loop.jar"]}
-         :deploy  {:extra-deps {slipset/deps-deploy {:mvn/version "0.1.1"}}
-                   :main-opts  ["-m" "deps-deploy.deps-deploy" "deploy" "loop.jar"]}}}
+         :deploy  {:extra-deps {slipset/deps-deploy {:mvn/version "RELEASE"}}
+                   :exec-fn    deps-deploy.deps-deploy/deploy
+                   :exec-args  {:installer      :remote
+                                ;:sign-releases? true
+                                :artifact       "loop.jar"}}}}
