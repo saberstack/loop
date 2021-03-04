@@ -1,4 +1,4 @@
-# Loop: Take control of your core.async loops!
+# Loop: Take control of your core.async go-loops!
 [![Clojars Project](https://img.shields.io/clojars/v/saberstack/loop.svg)](https://clojars.org/saberstack/loop)
 
 ## Install
@@ -12,7 +12,8 @@ saberstack/loop {:mvn/version "0.1.2"}
 ```
 
 
-## Usage
+## Usage 
+### Works the same in Clojure and ClojureScript
 
 Add require:
 
