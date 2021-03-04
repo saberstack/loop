@@ -11,3 +11,4 @@
 .hg/
 .idea
 *.iml
+*.lock
