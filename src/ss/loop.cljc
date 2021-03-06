@@ -82,7 +82,8 @@
 
 
 (defmacro go-loop [bindings & body]
-  (let [?id-expr#  (find-expr :id bindings)
+  (let [?id-expr#  (or (get (meta bindings) :id)
+                       (find-expr :id bindings))
         bindings'# (remove-ks #{:id} bindings)]
     `(start-go
        (fn [id# stop-ch#]

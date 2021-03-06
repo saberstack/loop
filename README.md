@@ -1,18 +1,19 @@
 # Loop: Take control of your core.async go-loops!
+
 [![Clojars Project](https://img.shields.io/clojars/v/saberstack/loop.svg)](https://clojars.org/saberstack/loop)
 
 ## Install
 
 ```clojure
 ;deps.edn
-saberstack/loop {:mvn/version "0.1.3"}
+saberstack/loop {:mvn/version "0.1.4"}
 
 ;Leiningen/Boot
-[saberstack/loop "0.1.3"]
+[saberstack/loop "0.1.4"]
 ```
 
+## Usage
 
-## Usage 
 ### Works the same in Clojure and ClojureScript
 
 Add require:
@@ -56,8 +57,8 @@ ss.loop/go-loop also supports giving identifier to a loop:
 
 ```clojure
 (ss|a/go-loop
-  [i 0
-   :id 42]
+  ^{:id 42}
+  [i 0]
   (println i)
   (a/<! (a/timeout 500))
   (recur (inc i)))
@@ -72,12 +73,14 @@ Now you can stop only this loop:
 ;=> true
 ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id 42]]
 ```
+
 If you start a second go-loop with the same :id, the first loop will be send a stop call.
 
-A ss.loop/go-loop always exits on the very next (recur ...) call. It does not "die" automagically in the middle of execution.
+A ss.loop/go-loop always exits on the very next (recur ...) call. It does not "die" automagically in the middle of
+execution.
 
-IMPORTANT: if the first loop is stuck waiting in its own code, say via (<! ...), there's no guarantee that it will be stopped before the second loop begins. 
-
+IMPORTANT: if the first loop is stuck waiting in its own code, say via (<! ...), there's no guarantee that it will be
+stopped before the second loop begins.
 
 ## License
 
