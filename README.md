@@ -53,7 +53,7 @@ Now, stop the go-loop from the REPL:
 ;... INFO [saberstack.loop:66] - [:saberstack.loop/stop [:id #uuid "..."]]
 ```
 
-ss.loop/go-loop also supports giving identifier to a loop:
+ss.loop/go-loop also supports giving each go-loop an identifier via metadata:
 
 ```clojure
 (ss|a/go-loop
