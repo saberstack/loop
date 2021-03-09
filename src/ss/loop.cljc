@@ -89,7 +89,7 @@
                        (find-expr :id bindings))
         bindings'# (remove-ks #{:id} bindings)]
 
-    `(let [stop-ch# (a/promise-chan (filter (fn [x] (= x :stop))))
+    `(let [stop-ch# (a/promise-chan (filter (fn [x#] (= x# :stop))))
            id#      (random-uuid)
            id'#     (if-let [?custom-id# ~?id-expr#]
                       ?custom-id#
