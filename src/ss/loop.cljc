@@ -89,11 +89,11 @@
                        (find-expr :id bindings))
         bindings'# (remove-ks #{:id} bindings)]
 
-    `(let [stop-ch#  (a/promise-chan (filter (fn [x] (= x :stop))))
-           id#       (random-uuid)
-           id'# (if-let [?custom-id# ~?id-expr#]
-                       ?custom-id#
-                       id#)]
+    `(let [stop-ch# (a/promise-chan (filter (fn [x] (= x :stop))))
+           id#      (random-uuid)
+           id'#     (if-let [?custom-id# ~?id-expr#]
+                      ?custom-id#
+                      id#)]
        (print-info [::start [:id id'#]])
 
        ;add stop-ch state
