@@ -62,14 +62,6 @@
       nil)))
 
 
-(defn start-go
-  "start-go-fn - fn that starts a go, takes new-uuid and stop-ch; needs to take care of stopping the go via alts!"
-  [start-go-fn]
-  (let [stop-ch (a/promise-chan (filter (fn [x] (= x :stop))))
-        id      (random-uuid)]
-    (start-go-fn id stop-ch)))
-
-
 (defn find-expr [k bindings]
   (let [[_ expr] (->> bindings
                       (partition 2)
@@ -96,31 +88,32 @@
   (let [?id-expr#  (or (get (meta bindings) :id)
                        (find-expr :id bindings))
         bindings'# (remove-ks #{:id} bindings)]
-    `(start-go
-       (fn [id# stop-ch#]
-         (let [final-id# (if-let [?custom-id# ~?id-expr#]
-                           ?custom-id#
-                           id#)]
-           (print-info [::start [:id final-id#]])
 
-           ;add stop-ch state
-           (add-state final-id# stop-ch#)
-           ;start the loop
-           (a/go
-             (let [ret#
-                   (a/<! (a/go
-                           ;the actual loop here
-                           (loop ~bindings'#
-                             (let [stop-or-nil# (a/poll! stop-ch#)]
-                               (if (= stop-or-nil# :stop)
-                                 ;going to stop the loop
-                                 (do
-                                   (print-info [::stop [:id final-id#]]))
-                                 ;else, continue
-                                 (do
-                                   ;user code
-                                   ~@body))))))]
-               ;this has to be here in an outside loop in order to cleanup after user code finishes
-               (cleanup-state final-id# stop-ch#)
-               ret#)))))))
+    `(let [stop-ch#  (a/promise-chan (filter (fn [x] (= x :stop))))
+           id#       (random-uuid)
+           id'# (if-let [?custom-id# ~?id-expr#]
+                       ?custom-id#
+                       id#)]
+       (print-info [::start [:id id'#]])
+
+       ;add stop-ch state
+       (add-state id'# stop-ch#)
+       ;start the loop
+       (a/go
+         (let [ret#
+               (a/<! (a/go
+                       ;the actual loop here
+                       (loop ~bindings'#
+                         (let [stop-or-nil# (a/poll! stop-ch#)]
+                           (if (= stop-or-nil# :stop)
+                             ;going to stop the loop
+                             (do
+                               (print-info [::stop [:id id'#]]))
+                             ;else, continue
+                             (do
+                               ;user code
+                               ~@body))))))]
+           ;this has to be here in an outside loop in order to cleanup after user code finishes
+           (cleanup-state id'# stop-ch#)
+           ret#)))))
 
