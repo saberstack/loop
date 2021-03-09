@@ -6,8 +6,11 @@
 
 
 #?(:clj
-   (defn random-uuid []
-     (java.util.UUID/randomUUID)))
+   (defn new-random-uuid []
+     (java.util.UUID/randomUUID))
+   :cljs
+   (defn new-random-uuid []
+     (cljs.core/random-uuid)))
 
 
 (defonce *id->stop-channels-set (atom {}))
@@ -90,7 +93,7 @@
         bindings'# (remove-ks #{:id} bindings)]
 
     `(let [stop-ch# (a/promise-chan (filter (fn [x#] (= x# :stop))))
-           id#      (random-uuid)
+           id#      (new-random-uuid)
            id'#     (if-let [?custom-id# ~?id-expr#]
                       ?custom-id#
                       id#)]

@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+# 0.2.2 (2021 Mar 08)
+Fix broken lib in ClojureScript.
+
+
 # 0.2.1 (2021 Mar 08)
 Code clean up.
 
