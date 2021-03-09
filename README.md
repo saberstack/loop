@@ -6,10 +6,10 @@
 
 ```clojure
 ;deps.edn
-saberstack/loop {:mvn/version "0.2.0"}
+saberstack/loop {:mvn/version "0.2.1"}
 
 ;Leiningen/Boot
-[saberstack/loop "0.2.0"]
+[saberstack/loop "0.2.1"]
 ```
 
 ## Usage
