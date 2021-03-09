@@ -10,25 +10,36 @@
      (java.util.UUID/randomUUID)))
 
 
-(defonce *id->stop-ch (atom {}))
+(defonce *id->stop-channels-set (atom {}))
 
 
-(defn cleanup [id stop-ch]
-  (swap! *id->stop-ch
+(defn cleanup-state [id stop-ch]
+  (swap! *id->stop-channels-set
     (fn [m]
-      (let [-stop-ch (get m id)]
-        ;IMPORTANT!
-        ;make sure we don't cleanup another loop's stop-ch
-        ;check if channels are the same
-        (if (= -stop-ch stop-ch)
-          ;yes, cleanup
+      (let [s  (get m id)
+            s' (disj s stop-ch)]
+        (if (empty? s')
+          ;empty set, remove :id from state
           (dissoc m id)
-          ;else, return as-is
-          m)))))
+          ;just "update" the state with the new set
+          (assoc m id s'))))))
 
 
-(defn stop-loop [[id stop-ch]]
-  (a/put! stop-ch :stop))
+(defn stop-loop [[id stop-channels-set]]
+  (run!
+    (fn [stop-ch] (a/put! stop-ch :stop))
+    stop-channels-set))
+
+
+(defn add-state [id stop-ch]
+  (swap! *id->stop-channels-set
+    (fn [m]
+      (let [s  (get m id #{})
+            s' (conj s stop-ch)]
+        ;stop all existing loops with the same id
+        (stop-loop [id s])
+        ;return new state
+        (assoc m id s')))))
 
 
 (defn stop-all
@@ -36,14 +47,14 @@
   []
   (run!
     stop-loop
-    @*id->stop-ch)
+    @*id->stop-channels-set)
   true)
 
 
 (defn stop
   "Stop a loop by id. Returns true if the loop exists, nil otherwise"
   [id]
-  (let [[_ _ :as e] (find @*id->stop-ch id)]
+  (let [[_ _ :as e] (find @*id->stop-channels-set id)]
     (if e
       (do
         (stop-loop e)
@@ -91,24 +102,25 @@
                            ?custom-id#
                            id#)]
            (print-info [::start [:id final-id#]])
-           ;stop loop with the same :id (if it exists)
-           (stop final-id#)
-           ;add stop-ch to atom
-           (swap! *id->stop-ch (fn [m#] (assoc m# final-id# stop-ch#)))
+
+           ;add stop-ch state
+           (add-state final-id# stop-ch#)
            ;start the loop
            (a/go
-             (let [ret# (a/<! (a/go
-                                ;the actual loop here
-                                (loop ~bindings'#
-                                  (let [stop-or-nil# (a/poll! stop-ch#)]
-                                    (if (= stop-or-nil# :stop)
-                                      ;going to stop the loop
-                                      (do
-                                        (print-info [::stop [:id final-id#]]))
-                                      ;else, continue
-                                      (do
-                                        ;user code
-                                        ~@body))))))]
-               (cleanup final-id# stop-ch#)
+             (let [ret#
+                   (a/<! (a/go
+                           ;the actual loop here
+                           (loop ~bindings'#
+                             (let [stop-or-nil# (a/poll! stop-ch#)]
+                               (if (= stop-or-nil# :stop)
+                                 ;going to stop the loop
+                                 (do
+                                   (print-info [::stop [:id final-id#]]))
+                                 ;else, continue
+                                 (do
+                                   ;user code
+                                   ~@body))))))]
+               ;this has to be here in an outside loop in order to cleanup after user code finishes
+               (cleanup-state final-id# stop-ch#)
                ret#)))))))
 
