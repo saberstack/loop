@@ -13,6 +13,7 @@
      (cljs.core/random-uuid)))
 
 
+;map of :an-id to a-set like {:some-id #{}}
 (defonce *id->stop-channels-set (atom {}))
 
 
