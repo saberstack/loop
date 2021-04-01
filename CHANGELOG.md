@@ -1,6 +1,9 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+# 0.2.3 (2021 Apr 01)
+Remove old :id code inside bindings.
+
 # 0.2.2 (2021 Mar 08)
 Fix broken lib in ClojureScript.
 
