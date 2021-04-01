@@ -66,33 +66,12 @@
       nil)))
 
 
-(defn find-expr [k bindings]
-  (let [[_ expr] (->> bindings
-                      (partition 2)
-                      (map vec)
-                      (filter (fn [[-k v]] (= -k k)))
-                      (first))]
-    expr))
-
-
-(defn remove-ks [ks-set bindinds]
-  (->> bindinds
-       (partition 2)
-       (map vec)
-       (remove (fn [[k v]] (contains? ks-set k)))
-       (flatten)
-       (vec)))
-
-
 (defn print-info [v]
   (timbre/info v))
 
 
 (defmacro go-loop [bindings & body]
-  (let [?id-expr#  (or (get (meta bindings) :id)
-                       (find-expr :id bindings))
-        bindings'# (remove-ks #{:id} bindings)]
-
+  (let [?id-expr# (get (meta bindings) :id)]
     `(let [stop-ch# (a/promise-chan (filter (fn [x#] (= x# :stop))))
            id#      (new-random-uuid)
            id'#     (if-let [?custom-id# ~?id-expr#]
@@ -107,7 +86,7 @@
          (let [ret#
                (a/<! (a/go
                        ;the actual loop here
-                       (loop ~bindings'#
+                       (loop ~bindings
                          (let [stop-or-nil# (a/poll! stop-ch#)]
                            (if (= stop-or-nil# :stop)
                              ;going to stop the loop
