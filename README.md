@@ -9,7 +9,7 @@
 saberstack/loop {:mvn/version "0.2.3"}
 
 ;Leiningen/Boot
-[saberstack/loop "0.2.2"]
+[saberstack/loop "0.2.3"]
 ```
 
 ## Usage
