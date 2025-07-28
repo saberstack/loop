@@ -69,6 +69,35 @@
 (defn print-info [v]
  (timbre/info v))
 
+(defmacro thread-loop [bindings & body]
+ (let [?id-expr# (get (meta bindings) :id)]
+  `(let [stop-ch# (a/promise-chan (filter (fn [x#] (= x# :stop))))
+         id#      (new-random-uuid)
+         id'#     (if-let [?custom-id# ~?id-expr#]
+                   ?custom-id#
+                   id#)]
+    (print-info [::start [:id id'#]])
+
+    ;add stop-ch state
+    (add-state id'# stop-ch#)
+    ;start the loop
+    (a/thread
+     (let [ret#
+           (a/<!! (a/thread
+                   ;the actual loop here
+                   (loop ~bindings
+                    (let [stop-or-nil# (a/poll! stop-ch#)]
+                     (if (= stop-or-nil# :stop)
+                      ;going to stop the loop
+                      (do
+                       (print-info [::stop [:id id'#]]))
+                      ;else, continue
+                      (do
+                       ;user code
+                       ~@body))))))]
+      ;this has to be here in an outside loop in order to cleanup after user code finishes
+      (cleanup-state id'# stop-ch#)
+      ret#)))))
 
 (defmacro go-loop [bindings & body]
  (let [?id-expr# (get (meta bindings) :id)]
@@ -99,4 +128,3 @@
       ;this has to be here in an outside loop in order to cleanup after user code finishes
       (cleanup-state id'# stop-ch#)
       ret#)))))
-
